@@ -77,6 +77,19 @@ let ``filtered with empty restrictions should give full set``() =
 
 
 [<Test>]
+let ``filtered with empty should not remove netstandard``() = 
+    let set = 
+      [PackageName("P1"), VersionRequirement.AllReleases, FrameworkRestrictionList []
+       PackageName("P2"), VersionRequirement.AllReleases, FrameworkRestrictionList [FrameworkRestriction.AtLeast (DotNetFramework(FrameworkVersion.V4))]
+       PackageName("P3"), VersionRequirement.AllReleases, FrameworkRestrictionList [FrameworkRestriction.AtLeast (DotNetFramework(FrameworkVersion.V4_5_1)); FrameworkRestriction.Exactly (DotNetStandard(DotNetStandardVersion.V1_3))]]
+      |> Set.ofList
+
+    set
+    |> DependencySetFilter.filterByRestrictions (FrameworkRestrictionList [])
+    |> shouldEqual set
+
+
+[<Test>]
 let ``filtered with concrete restriction should filter non-matching``() = 
     let original = 
       [PackageName("P1"), VersionRequirement.AllReleases,FrameworkRestrictionList []

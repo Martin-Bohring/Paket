@@ -1,7 +1,24 @@
-#### 2.60.2 - 13.04.2016
-* BUGFIX: Don't set CopyToOutputDirectory for Compile items - https://github.com/fsprojects/Paket/issues/1592
+#### 2.63.2 - 25.04.2016
+* Fix path issue on linux - https://github.com/fsprojects/Paket/pull/1644/files
 
-#### 2.60.1 - 13.04.2016
+#### 2.63.1 - 22.04.2016
+* Don't pack template files in packages or paket-files
+
+#### 2.63.0 - 22.04.2016
+* Added monoandroid43 to be matched as Some MonoAndroid - https://github.com/fsprojects/Paket/pull/1631
+* Added support for MonoAndroid22 and MonoAndroid23 - https://github.com/fsprojects/Paket/pull/1628
+* BUGFIX: allow directory names with + in paket.template
+* BUGFIX: Generates binding redirect for references targeting different profiles - https://github.com/fsprojects/Paket/pull/1634
+* EXPERIMENTAL: paket resolves runtime dependency libs - https://github.com/fsprojects/Paket/pull/1626
+* USABILITY: remove command restricts install to the specified group only - https://github.com/fsprojects/Paket/pull/1612
+
+#### 2.62.0 - 17.04.2016
+* Refactoring Bootstrapper to introduce better coverage and testing - https://github.com/fsprojects/Paket/pull/1603
+
+#### 2.61.0 - 17.04.2016
+* Support .NET platform standard packages - https://github.com/fsprojects/Paket/issues/1614
+* Support .NET 4.6.2 - https://github.com/fsprojects/Paket/issues/1614
+* BUGFIX: Don't set CopyToOutputDirectory for Compile items - https://github.com/fsprojects/Paket/issues/1592
 * BUGFIX: Allow to pack packages with ReflectedDefinition - https://github.com/fsprojects/Paket/pull/1602
 
 #### 2.60.0 - 12.04.2016

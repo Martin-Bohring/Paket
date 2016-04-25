@@ -762,7 +762,10 @@ module ProjectFile =
 
         let conditions =
             model.ReferenceFileFolders
-            |> List.map (fun lib -> PlatformMatching.getCondition referenceCondition lib.Targets,createItemGroup lib.Files.References)
+            |> List.choose (fun lib -> 
+                match lib with
+                | x when (match x.Targets with | [SinglePlatform(Runtimes(_))] -> true | _ -> false) -> None  // TODO: Add reference to custom task instead
+                | _ -> Some (PlatformMatching.getCondition referenceCondition lib.Targets,createItemGroup lib.Files.References))
             |> List.sortBy fst
 
         let targetsFileConditions =
@@ -902,6 +905,7 @@ module ProjectFile =
             (usedPackages : Map<GroupName*PackageName,_*InstallSettings>) hard (project:ProjectFile) =
         removePaketNodes project
 
+        let packagesWithRuntimeDependencies = System.Collections.Generic.HashSet<_>()
         completeModel
         |> Seq.filter (fun kv -> usedPackages.ContainsKey kv.Key)
         |> Seq.map (fun kv -> 
@@ -927,6 +931,18 @@ module ProjectFile =
 
             let copyLocal = defaultArg installSettings.CopyLocal true
             let importTargets = defaultArg installSettings.ImportTargets true
+
+            let hasRunTimeStuff =
+                projectModel.ReferenceFileFolders
+                |> Seq.collect (fun lib -> 
+                    match lib with
+                    | x when (match x.Targets with | [SinglePlatform(Runtimes(_))] -> true | _ -> false) -> lib.Files.References
+                    | _ -> Set.empty)
+                |> Seq.isEmpty
+                |> not
+
+            if hasRunTimeStuff then
+                packagesWithRuntimeDependencies.Add(kv.Key) |> ignore
 
             generateXml projectModel copyLocal importTargets installSettings.ReferenceCondition project)
         |> Seq.iter (fun (propsNodes,targetsNodes,chooseNode,propertyChooseNode, analyzersNode) ->
@@ -1000,6 +1016,18 @@ module ProjectFile =
             if analyzersNode.ChildNodes.Count > 0 then
                 project.ProjectNode.AppendChild analyzersNode |> ignore
             )
+
+ //       if Seq.isEmpty packagesWithRuntimeDependencies then () else
+
+//        let allPackages =
+//            packagesWithRuntimeDependencies 
+//            |> Seq.map (fun (group,packageName) ->
+//                if group = Constants.MainDependencyGroup then
+//                   packageName.ToString()
+//                else
+//                   sprintf "%O#%O" group packageName)
+//            |> fun xs -> String.Join(";",xs)
+//        failwithf "%s" allPackages
 
     let save forceTouch project =
         if Utils.normalizeXml project.Document <> project.OriginalText || not (File.Exists(project.FileName)) then

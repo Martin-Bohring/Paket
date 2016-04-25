@@ -121,7 +121,7 @@ let parseODataDetails(nugetURL,packageName:PackageName,version:SemVerInfo,raw) =
     let entry = 
         match (doc |> getNode "feed" |> optGetNode "entry" ) ++ (doc |> getNode "entry") with
         | Some node -> node
-        | _ -> failwithf "unable to find entry node for package %O %O" packageName version
+        | _ -> failwithf "unable to find entry node for package %O %O in %s" packageName version raw
 
     let officialName =
         match (entry |> getNode "properties" |> optGetNode "Id") ++ (entry |> getNode "title") with
@@ -471,7 +471,10 @@ let private getFiles targetFolder subFolderName filesDescriptionForVerbose =
     files
 
 /// Finds all libraries in a nuget package.
-let GetLibFiles(targetFolder) = getFiles targetFolder "lib" "libraries"
+let GetLibFiles(targetFolder) = 
+    let libs = getFiles targetFolder "lib" "libraries"
+    let runtimeLibs = getFiles targetFolder "runtimes" "libraries"
+    Array.append libs runtimeLibs
 
 /// Finds all targets files in a nuget package.
 let GetTargetsFiles(targetFolder) = getFiles targetFolder "build" ".targets files"
